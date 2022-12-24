@@ -10,7 +10,7 @@ from mutagen.easyid3 import EasyID3
 from yt_dlp.postprocessor import MetadataParserPP
 
 
-musicbrainzngs.set_useragent("Playlist Downloader - yt-dlp fork", "1", "https://github.com/s6fty")
+musicbrainzngs.set_useragent("Playlist Downloader - yt-dlp fork", "1", "https://github.com/s6fty/playlist-dl")
 config = configparser.ConfigParser()
 
 try:
