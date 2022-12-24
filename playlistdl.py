@@ -6,10 +6,11 @@ import shutil
 import musicbrainzngs
 import glob
 import re
+from mutagen.easyid3 import EasyID3
 from yt_dlp.postprocessor import MetadataParserPP
 
 
-#musicbrainzngs.set_useragent("Playlist Downloader - yt-dlp fork", "1", "https://github.com/s6fty")
+musicbrainzngs.set_useragent("Playlist Downloader - yt-dlp fork", "1", "https://github.com/s6fty")
 config = configparser.ConfigParser()
 
 try:
@@ -40,18 +41,14 @@ except FileNotFoundError:
 
 config.read('defaults.cfg')
 
-print("Please enter a playlist: ")
-playlist = input("")
+#print("Please enter a playlist: ")
+#playlist = input("")
 
 directory = config['CFG']['directory']
 audio_format = config['CFG']['audio format']
-
 cwd = os.getcwd() # Get current directory
 temp = cwd + '/.tmp' # Create a temporary directory
 os.path.exists(temp) or os.mkdir(temp) # If temp directory exist, don't try to create new one, if doesnt create one 
-
-
-
 
 ydl_opts = { 
         'paths' : { "temp" : temp, "home" : directory}, # Adding paths
@@ -68,16 +65,26 @@ ydl_opts = {
 with yt_dlp.YoutubeDL(ydl_opts) as ydl: 
     error_code = ydl.download(playlist) # Finally video starts to download 
 
-# deneme = (cwd + "/deneme/")
-# sub_str = " - "
-# for music in os.listdir(deneme):
-#     filename, extension = path.splitext(music)
-#     filename = filename.split(sub_str)
-#     qartist = "".join(map(str, filename[0]))                     ## Metadata Fetcher
-#     qtitle = "".join(map(str, filename[1]))
-#     #print(qtitle,qartist)
-#     result = musicbrainzngs.search_releases(artist = qartist, release = qtitle, limit = 5)
-#     # for artist in result:
-#     print(result)
+"""
+test = (cwd + "/test/") 
+sub_str = " - "
+for music in os.listdir(test):
+    audio = EasyID3(test + "" +music)
+    filename, extension = path.splitext(music)
+    filename = filename.split(sub_str)
+    qartist = "".join(map(str, filename[0]))                  ####### Metadata Fetcher #######
+    qtitle = "".join(map(str, filename[1]))
+    #print(qtitle,qartist)
+    recording = musicbrainzngs.search_recordings(artist = qartist, recording = qtitle, strict=True) # for artist in result:
+    for record in recording['recording-list']:
+        title = record['title']
+        if (title == qtitle):
+            record_id = (record['id'])
+            rec_details = musicbrainzngs.get_recording_by_id(record_id,includes=["artists", "tags"])
+            audio['title'] = EasyID3((rec_details['recording']['title']))
+            audio['artist'] = EasyID3((rec_details['recording']['artist-credit-phrase']))
+            audio.save()
+            break
+"""
 
 shutil.rmtree(temp, ignore_errors=False) # Deleting the temp file
